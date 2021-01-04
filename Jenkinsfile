@@ -32,7 +32,7 @@ pipeline {
                         sh 'docker push 778477161868.dkr.ecr.us-west-2.amazonaws.com/rythm-svc-socketio:latest'
                     }
                     dir('rythm-socketio-cdk') {
-                        // sh 'cdk deploy "RythmSocketioCdkStackSocketioSvcStackCCE4EA7E" --require-approval=never'
+                        sh 'cdk deploy "RythmSocketioCdkStackSocketioSvcStackCCE4EA7E" --require-approval=never'
                     }
                 }
             }
