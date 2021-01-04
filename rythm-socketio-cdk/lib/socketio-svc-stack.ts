@@ -5,27 +5,19 @@ import * as ecr from "@aws-cdk/aws-ecr";
 import * as iam from "@aws-cdk/aws-iam";
 
 interface SocketioSvcStackProps extends cdk.StackProps {
-  cluster: ecs.Cluster;
-  vpc: ec2.Vpc;
+  cluster: ecs.ICluster;
+  vpc: ec2.IVpc;
 }
 
 export class SocketioSvcStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: SocketioSvcStackProps) {
     super(scope, id, props);
 
+    new cdk.CfnOutput(this, "RythmClusterARN", {
+      value: props.cluster.clusterArn,
+    });
+
     const repo = ecr.Repository.fromRepositoryName(this, "SocketioSvcRepo", "rythm-svc-socketio");
-
-    const vpcx = ec2.Vpc.fromLookup(this, "RythmVpc", {
-      tags: {
-        application: "rythm",
-      },
-    });
-
-    const x = ecs.Cluster.fromClusterAttributes(this, "id", {
-      vpc: vpcx,
-      clusterName: "rythm-cluster",
-      securityGroups: [],
-    });
 
     // Create the role to run Tasks.
     const role = new iam.Role(this, "SocketioTaskRole", {
@@ -80,7 +72,5 @@ export class SocketioSvcStack extends cdk.Stack {
       assignPublicIp: true,
       securityGroups: [securityGroup],
     });
-
-    // service.tas
   }
 }

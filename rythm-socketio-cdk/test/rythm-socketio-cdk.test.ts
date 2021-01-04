@@ -1,13 +1,18 @@
-import { expect as expectCDK, matchTemplate, MatchStyle } from '@aws-cdk/assert';
-import * as cdk from '@aws-cdk/core';
-import * as RythmSocketioCdk from '../lib/rythm-socketio-cdk-stack';
+import { expect as expectCDK, matchTemplate, MatchStyle } from "@aws-cdk/assert";
+import * as cdk from "@aws-cdk/core";
+import * as RythmSocketioCdk from "../lib/_rythm-socketio-cdk-stack";
 
-test('Empty Stack', () => {
-    const app = new cdk.App();
-    // WHEN
-    const stack = new RythmSocketioCdk.RythmSocketioCdkStack(app, 'MyTestStack');
-    // THEN
-    expectCDK(stack).to(matchTemplate({
-      "Resources": {}
-    }, MatchStyle.EXACT))
+test("Empty Stack", () => {
+  const app = new cdk.App();
+  // WHEN
+  const stack = new RythmSocketioCdk.RythmSocketioCdkStack(app, "MyTestStack");
+  // THEN
+  expectCDK(stack).to(
+    matchTemplate(
+      {
+        Resources: {},
+      },
+      MatchStyle.EXACT
+    )
+  );
 });

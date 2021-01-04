@@ -1,4 +1,4 @@
-// Testing webhook. #2
+// Testing webhook. #9
 pipeline {
     agent any
     stages {
@@ -12,47 +12,36 @@ pipeline {
             }
         }
 
-        // stage('Build') {
-        //     parallel {
-        //         stage('Build Lambda') {
-        //             steps {
-        //                 dir('lambda-app') {
-        //                     sh 'npm install'
-        //                     sh 'npm run build'
-        //                     sh 'cp -r ./build ../cdk-app-02/builds/lambda-app-build'
-        //                 }
-        //             }
-        //         }
+        stage('Building') {
+            steps {
+                withAWS(credentials: 'build-credentials', region: 'us-west-2') {
+                    dir('rythm-socketio-cdk') {
+                        sh 'npm install'
+                        sh 'cdk list'
+                        sh 'cdk synth --all'
+                        sh 'cdk deploy "RythmSocketioCdkStackSocketioEcrStack1F27DE93" --require-approval=never'
+                    }
+                    dir('rythm-socketio-svc') {
+                        sh 'aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 778477161868.dkr.ecr.us-west-2.amazonaws.com'
+                        sh 'docker build -t rythm-svc-socketio .'
+                        sh 'docker tag rythm-svc-socketio:latest 778477161868.dkr.ecr.us-west-2.amazonaws.com/rythm-svc-socketio:latest'
+                        sh 'docker push 778477161868.dkr.ecr.us-west-2.amazonaws.com/rythm-svc-socketio:latest'
+                    }
+                    dir('rythm-socketio-cdk') {
+                        // sh 'cdk deploy "RythmSocketioCdkStackSocketioSvcStackCCE4EA7E" --require-approval=never'
+                    }
+                }
+            }
+        }
 
-        //         stage('Build React') {
-        //             steps {
-        //                 dir('react-app') {
-        //                     sh 'npm install'
-        //                     sh 'npm run build'
-        //                     sh 'cp -r ./build ../cdk-app-02/builds/react-app-build'
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
-        // stage('Deploy') {
-        //     parallel {
-        //         stage('Run the CDK') {
-        //             steps {
-        //                 dir('cdk-app-02') {
-        //                     withAWS(credentials: 'kysen-build-dev', region: 'us-east-1') {
-        //                         sh 'aws s3 ls'
-        //                         sh 'npm install'
-        //                         sh 'npm run build'
-        //                         sh 'cdk deploy \\"*\\" --require-approval=never'
-        //                         sh 'aws s3 sync builds/react-app-build/build s3://origin.mytodos.xyz --acl public-read'
-        //                         sh 'aws cloudfront create-invalidation --distribution-id E3B6B3IT43ZK0P --paths "/*"'
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        stage('ECS') {
+            steps {
+                withAWS(credentials: 'build-credentials', region: 'us-west-2') {
+                    // sh 'aws ecs update-service --desired-count 0 --cluster rythm-cluster --service rythm-socketio-service'
+                    // sh 'aws ecs wait services-stable --cluster rythm-cluster --services rythm-socketio-service'
+                    // sh 'aws ecs update-service --desired-count 1 --cluster rythm-cluster --service rythm-socketio-service --force-new-deployment'
+                }
+            }
+        }
     }
 }
