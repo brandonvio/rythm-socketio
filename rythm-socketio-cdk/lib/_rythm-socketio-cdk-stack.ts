@@ -3,6 +3,7 @@ import * as ec2 from "@aws-cdk/aws-ec2";
 import * as ecs from "@aws-cdk/aws-ecs";
 import { EcrStack } from "./ecr-stack";
 import { SocketioSvcStack } from "./socketio-svc-stack";
+import { AlbStack } from "./alb-stack";
 
 export class RythmSocketioCdkStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -31,5 +32,10 @@ export class RythmSocketioCdkStack extends cdk.Stack {
       cluster: cluster,
       vpc: vpc,
     });
+
+    // const albStack = new AlbStack(this, "AlbStack", {
+    //   stackName: "alb-stack",
+    //   env: props?.env,
+    // });
   }
 }
