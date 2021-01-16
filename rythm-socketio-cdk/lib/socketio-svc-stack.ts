@@ -43,6 +43,7 @@ export class SocketioSvcStack extends cdk.Stack {
 
     const container = task.addContainer("SocketioTaskContainer", {
       image: ecs.ContainerImage.fromEcrRepository(repo, "latest"),
+      cpu: 256,
       memoryLimitMiB: 512,
       logging: new ecs.AwsLogDriver({ streamPrefix: "SocketioService" }),
       environment: {
